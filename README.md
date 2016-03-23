@@ -2,7 +2,6 @@
 
 This plugins adds functionality for simple http authentication with Roda.
 
-
 ## Configuration
 
 Configure your Roda application to use this plugin:
@@ -11,7 +10,7 @@ Configure your Roda application to use this plugin:
 plugin :basic_auth
 ```
 
-You can pass global options, in this context they'll shared between all
+You can pass global options, in this context they'll be shared between all
 basic\_auth calls.
 
 ```ruby
@@ -36,15 +35,13 @@ To avoid having your 401 responses intercepted by warden, you need to configure
 the unauthenticated callback that is called just before the request is halted:
 
 ```ruby
-plugin :basic_auth, unauthorized: proc{|r| r.env['warden'].custom_failure! }
+plugin :basic_auth, unauthorized: proc {|r| r.env['warden'].custom_failure! }
 ```
 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/badosu/roda-basic-auth.
 
-
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
