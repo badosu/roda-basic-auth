@@ -1,6 +1,6 @@
 # Roda Basic Authentication
 
-This plugins adds functionality for simple http authentication with Roda.
+Adds functionality for simple http authentication with Roda.
 
 ## Configuration
 
@@ -14,7 +14,7 @@ You can pass global options, in this context they'll be shared between all
 basic\_auth calls.
 
 ```ruby
-plugin :basic_auth, authenticator: {|user, pass| [user, pass] == %w[foo bar]},
+plugin :basic_auth, authenticator: proc {|user, pass| [user, pass] == %w[foo bar]},
                     realm: 'Restricted Area' # default
 ```
 
