@@ -1,5 +1,7 @@
 # Roda Basic Authentication
 
+[![Build Status](https://travis-ci.org/badosu/roda-basic-auth.png)](https://travis-ci.org/badosu/roda-basic-auth)
+
 Adds functionality for simple http authentication with Roda.
 
 ## Configuration
