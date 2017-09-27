@@ -11,7 +11,7 @@ describe 'Roda::RodaPlugins::BasicAuth' do
     describe 'when local authenticator is set' do
       before { app_root { |u, p| [u, p] == %w[baz inga] } }
 
-      it 'overrides the global succeding' do
+      it 'overrides the global succeeding' do
         basic_authorize 'baz', 'inga'
 
         get '/'
