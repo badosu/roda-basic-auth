@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/badosu/roda-basic-auth.png)](https://travis-ci.org/badosu/roda-basic-auth)
 
-Adds functionality for simple http authentication with Roda.
+Adds basic http authentication to Roda.
 
 ## Configuration
 
@@ -13,7 +13,7 @@ plugin :basic_auth
 ```
 
 You can pass global options, in this context they'll be shared between all
-basic\_auth calls.
+`r.basic_auth` calls.
 
 ```ruby
 plugin :basic_auth, authenticator: proc {|user, pass| [user, pass] == %w[foo bar]},
@@ -22,8 +22,10 @@ plugin :basic_auth, authenticator: proc {|user, pass| [user, pass] == %w[foo bar
 
 ## Usage
 
-Call `r.basic_auth` when you want to authenticate the user, it halts the
-request with 401 response code if the authenticator is false.
+Call `r.basic_auth` inside the routes you want to authenticate the user, it will halt
+the request with 401 response code if the authenticator is false.
+
+An additional `WWW-Authenticate` header is sent as specified on [rfc7235](https://tools.ietf.org/html/rfc7235#section-4.1) and it's realm can be configured.
 
 You can specify the local authenticator with a block:
 
