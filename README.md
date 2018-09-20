@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/badosu/roda-basic-auth.png)](https://travis-ci.org/badosu/roda-basic-auth)
 
-Adds basic http authentication to Roda.
+Add basic http authentication to Roda.
 
 ## Configuration
 
