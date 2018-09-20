@@ -31,6 +31,12 @@ You can specify the local authenticator with a block:
 r.basic_auth { |user, pass| [user, pass] == %w[foo bar] }
 ```
 
+## Test
+
+```sh
+bundle exec ruby test/*.rb
+```
+
 ## Warden
 
 To avoid having your 401 responses intercepted by warden, you need to configure
