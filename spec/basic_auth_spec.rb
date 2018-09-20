@@ -28,7 +28,7 @@ describe 'Roda::RodaPlugins::BasicAuth' do
       describe 'and new authenticator does not match' do
         let(:credentials) { %w[foo bar] }
 
-        it 'is authorized' do
+        it 'is unauthorized' do
           assert_unauthorized
         end
       end
