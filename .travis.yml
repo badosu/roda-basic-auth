@@ -2,4 +2,4 @@ language: ruby
 rvm:
   - 2.3.1
   - 2.4.2
-script: ruby spec/*_spec.rb
+script: rake test TESTOPTS="-v"

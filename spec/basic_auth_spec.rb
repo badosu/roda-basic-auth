@@ -1,98 +1,145 @@
 require File.expand_path("spec_helper", File.dirname(__FILE__))
 
 describe 'Roda::RodaPlugins::BasicAuth' do
-  describe 'When global authenticator is configured' do
+  describe 'when global authenticator is configured' do
     before do
       roda do |r|
         r.plugin :basic_auth, authenticator: ->(u, p) { [u, p] == %w[foo bar] }
       end
     end
 
-    describe 'when local authenticator is set' do
-      before { app_root { |u, p| [u, p] == %w[baz inga] } }
+    describe 'and local authenticator is set' do
+      before do
+        app_root { |u, p| [u, p] == %w[baz inga] }
 
-      it 'overrides the global succeding' do
-        basic_authorize 'baz', 'inga'
+        basic_authorize(*credentials)
 
         get '/'
-
-        assert_authorized
       end
 
-      it 'overrides the global failing' do
-        basic_authorize 'foo', 'bar'
+      describe 'and new authenticator matches' do
+        let(:credentials) { %w[baz inga] }
 
-        get '/'
+        it 'is authorized' do
+          assert_authorized
+        end
+      end
 
-        assert_unauthorized
+      describe 'and new authenticator does not match' do
+        let(:credentials) { %w[foo bar] }
+
+        it 'is authorized' do
+          assert_unauthorized
+        end
       end
     end
 
     describe 'when no local authenticator is set' do
       before { app_root }
 
-      describe 'when authenticator passes' do
-        before { basic_authorize 'foo', 'bar' }
+      describe 'and no credentials are passed' do
+        before { get '/' }
 
-        it 'serves the content' do
-          get '/'
-
-          assert_authorized
-        end
+        it('is unauthorized') { assert_unauthorized }
       end
 
-      describe 'when authenticator fails' do
-        before { basic_authorize 'foo', 'baz' }
+      describe 'and credentials are passed' do
+        before do
+          basic_authorize(*credentials)
 
-        it 'is unauthorized' do
           get '/'
-
-          assert_unauthorized
         end
-      end
 
-      describe 'when no credentials are passed' do
-        it 'is unauthorized' do
-          get '/'
+        describe 'and they match the global authenticator' do
+          let(:credentials) { %w[foo bar] }
 
-          assert_unauthorized
+          it('is authorized') { assert_authorized }
+        end
+
+        describe 'and they do not match the global authenticator' do
+          let(:credentials) { %w[foo baz] }
+
+          it('is unauthorized') { assert_unauthorized }
         end
       end
     end
   end
 
-  describe 'When no global authenticator is configured' do
-    before do
-      roda { |r| r.plugin :basic_auth }
-    end
+  describe 'when no global authenticator is configured' do
+    before { roda { |r| r.plugin :basic_auth } }
 
-    describe 'when local authenticator is set' do
-      before { app_root { |u, p| [u, p] == %w[baz inga] } }
+    describe 'and local authenticator is configured' do
+      before do
+        app_root { |u, p| [u, p] == %w[baz inga] }
 
-      it 'authorizes when the authenticator passes' do
-        basic_authorize 'baz', 'inga'
+        basic_authorize(*credentials)
 
         get '/'
-
-        assert_authorized
       end
 
-      it 'unauthorizes when the authenticator fails' do
-        basic_authorize 'foo', 'bar'
+      describe 'and local authenticator matches' do
+        let(:credentials) { %w[baz inga] }
 
-        get '/'
+        it('is authorized') { assert_authorized }
+      end
 
-        assert_unauthorized
+      describe 'and local authenticator does not match' do
+        let(:credentials) { %w[foo bar] }
+
+        it('is unauthorized') { assert_unauthorized }
       end
     end
 
-    describe 'when no local authenticator is set' do
+    describe 'and no local authenticator is configured' do
       it 'raises an error' do
         app_root
 
         exception = assert_raises(RuntimeError) { get '/' }
-        assert_equal( "Must provide an authenticator block", exception.message )
+
+        assert_equal("Must provide an authenticator block", exception.message)
       end
+    end
+  end
+
+  describe 'when realm is configured globally' do
+    before { roda { |r| r.plugin :basic_auth, realm: "NetherRealm" } }
+
+    it 'is sent on WWW-Authenticate on unauthorization' do
+      app_root { |u, p| [u, p] == %w[baz inga] }
+
+      get '/'
+
+      assert_unauthorized
+
+      assert_equal("Basic realm=\"NetherRealm\"",
+                   last_response['WWW-Authenticate'])
+    end
+  end
+
+  describe 'when realm is configured locally' do
+    before { roda { |r| r.plugin :basic_auth } }
+
+    it 'is sent on WWW-Authenticate on unauthorization' do
+      app_root(realm: "NoetherRealm") { |u, p| [u, p] == %w[baz inga] }
+
+      get '/'
+
+      assert_unauthorized(realm: "NoetherRealm")
+    end
+  end
+
+  describe 'when realm is not configured' do
+    before { roda { |r| r.plugin :basic_auth } }
+
+    it 'sends "Restricted Area" on WWW-Authenticate on unauthorization' do
+      app_root { |u, p| [u, p] == %w[baz inga] }
+
+      get '/'
+
+      assert_unauthorized
+
+      assert_equal('Basic realm="Restricted Area"',
+                   last_response['WWW-Authenticate'])
     end
   end
 end

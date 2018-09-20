@@ -5,17 +5,15 @@ require 'roda'
 
 require 'rack/test'
 
-Base = Class.new(Roda)
-
 class Minitest::Spec
   include Rack::Test::Methods
 
   attr_accessor :app
 
-  def app_root(&block)
+  def app_root(*opts, &block)
     app.route do |r|
       r.root do
-        r.basic_auth(&block)
+        r.basic_auth(*opts, &block)
 
         "I am ROOT!"
       end
@@ -23,7 +21,7 @@ class Minitest::Spec
   end
 
   def roda
-    app = Class.new(Base)
+    app = Class.new(Roda)
 
     yield app
 
@@ -35,8 +33,8 @@ class Minitest::Spec
     assert_equal "I am ROOT!", last_response.body
   end
 
-  def assert_unauthorized
+  def assert_unauthorized(realm: app.opts[:basic_auth][:realm])
     assert_equal 401, last_response.status
-    assert_equal "Basic realm=\"Restricted Area\"", last_response['WWW-Authenticate']
+    assert_equal "Basic realm=\"#{realm}\"", last_response['WWW-Authenticate']
   end
 end
