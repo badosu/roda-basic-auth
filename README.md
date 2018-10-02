@@ -1,3 +1,4 @@
+# Project moved to [roda-http-auth](https://github.com/badosu/roda-http-auth)
 # Roda Basic Authentication
 
 [![Build Status](https://travis-ci.org/badosu/roda-basic-auth.png)](https://travis-ci.org/badosu/roda-basic-auth)
